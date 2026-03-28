@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Lavie Café | Premium Menu</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&family=Tajawal:wght@400;500;700&family=Playfair+Display:ital@1&display=swap" rel="stylesheet">
+    
+    <style>
+        /* =========================================
+           1. PREMIUM VARIABLES & RESET
+           ========================================= */
+        :root {
+            --primary-blue: #64B5F6;
+            --light-blue: #E3F2FD;
+            --white: #ffffff;
+            --text-dark: #1F2937;
+            --text-muted: #6B7280;
+            --glass-bg: rgba(255, 255, 255, 0.65);
+            --glass-border: rgba(255, 255, 255, 0.8);
+            --glass-shadow: 0 8px 32px 0 rgba(100, 181, 246, 0.15);
+            --transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        body {
+            background: linear-gradient(-45deg, #f8fbff, #e6f0fa, #f0f7ff, #ffffff);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            color: var(--text-dark);
+            margin: 0;
+            padding-top: 100px;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Language Mode Logic */
+        body.ar-mode { font-family: 'Tajawal', sans-serif; }
+        body.en-mode { font-family: 'Poppins', sans-serif; }
+        
+        body.ar-mode .en-only { display: none !important; }
+        body.en-mode .ar-only { display: none !important; }
+
+        .quote-font { font-family: 'Playfair Display', serif; font-style: italic; }
+
+        /* =========================================
+           2. SPLASH SCREEN
+           ========================================= */
+        #splash-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100vh;
+            background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(20px);
+            z-index: 99999; display: flex; flex-direction: column; justify-content: center; align-items: center;
+            transition: opacity 0.8s ease, visibility 0.8s ease;
+        }
+
+        .splash-icon { width: 120px; height: 120px; margin-bottom: 20px; animation: rotateSlow 10s linear infinite; }
+        .single-line-path {
+            fill: none; stroke: var(--primary-blue); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
+            stroke-dasharray: 1000; stroke-dashoffset: 1000; animation: drawLine 3s ease forwards;
+        }
+        @keyframes drawLine { to { stroke-dashoffset: 0; } }
+        @keyframes rotateSlow { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+        .splash-text {
+            text-align: center; color: var(--text-dark); font-size: 1.6rem; line-height: 1.5;
+            opacity: 0; transform: translateY(20px); animation: fadeUpIn 1s 1s forwards;
+        }
+
+        .enter-btn {
+            margin-top: 40px; padding: 10px 35px; background: transparent; border: 2px solid var(--primary-blue); border-radius: 30px;
+            color: var(--primary-blue); font-size: 1.1rem; cursor: pointer; font-weight: bold;
+            transition: var(--transition); opacity: 0; transform: translateY(20px); animation: fadeUpIn 1s 1.5s forwards;
+            font-family: 'Tajawal', sans-serif;
+        }
+        .enter-btn:hover { background: var(--primary-blue); color: var(--white); box-shadow: 0 5px 15px rgba(100, 181, 246, 0.4); }
+        body.en-mode .enter-btn { font-family: 'Poppins', sans-serif; }
+        @keyframes fadeUpIn { to { opacity: 1; transform: translateY(0); } }
+
+        /* =========================================
+           3. NAVBAR & SEARCH
+           ========================================= */
+        .glass-nav {
+            background: var(--glass-bg); backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--glass-border); box-shadow: var(--glass-shadow); padding: 10px 0;
+        }
+
+        .nav-logo { height: 65px; width: auto; object-fit: contain; transition: var(--transition); }
+        .nav-controls { display: flex; align-items: center; gap: 15px; }
+
+        .lang-btn {
+            background: var(--light-blue); color: var(--primary-blue); border: none; border-radius: 20px; padding: 5px 15px; font-weight: 600; cursor: pointer; transition: var(--transition);
+        }
+        .lang-btn:hover { background: var(--primary-blue); color: var(--white); }
+
+        .search-box {
+            position: relative; width: 45px; height: 45px; transition: var(--transition);
+            overflow: hidden; border-radius: 25px; background: var(--white); box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+        .search-box:focus-within, .search-box.active { width: 220px; border: 1px solid var(--primary-blue); }
+        .search-box input { width: 100%; height: 100%; border: none; outline: none; padding: 0 15px; background: transparent; font-size: 0.95rem; }
+        body.ar-mode .search-box input { padding-right: 45px; padding-left: 15px; }
+        body.en-mode .search-box input { padding-left: 45px; padding-right: 15px; }
+        .search-icon { position: absolute; top: 50%; transform: translateY(-50%); color: var(--primary-blue); cursor: pointer; font-size: 1.1rem; }
+        body.ar-mode .search-icon { right: 15px; }
+        body.en-mode .search-icon { left: 15px; }
+
+        /* =========================================
+           4. MENU CATEGORIES & ITEMS
+           ========================================= */
+        .menu-category {
+            background: var(--glass-bg); backdrop-filter: blur(15px);
+            border: 1px solid var(--white); border-radius: 24px; padding: 35px 30px; margin-bottom: 40px; box-shadow: var(--glass-shadow); transition: var(--transition);
+        }
+        .menu-category:hover { transform: translateY(-5px); box-shadow: 0 15px 40px rgba(100, 181, 246, 0.2); }
+
+        .category-header { display: flex; align-items: center; justify-content: center; margin-bottom: 30px; position: relative; }
+        .category-header::after { content: ''; position: absolute; bottom: -10px; width: 50px; height: 3px; background: var(--primary-blue); border-radius: 5px; }
+        .category-header h2 { font-size: 1.8rem; font-weight: 600; margin: 0 15px; color: var(--text-dark); }
+        .category-header .icon { font-size: 1.5rem; color: var(--primary-blue); }
+
+        .menu-item {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 18px 15px; border-bottom: 1px solid rgba(0,0,0,0.05); transition: var(--transition); flex-wrap: wrap; gap: 10px;
+        }
+        .menu-item:last-child { border-bottom: none; }
+        .menu-item:hover { background: rgba(255,255,255,0.5); border-radius: 12px; transform: scale(1.01); }
+
+        .item-names { font-weight: 600; font-size: 1.15rem; color: var(--text-dark); flex-grow: 1; }
+
+        .price-container { display: flex; align-items: center; gap: 15px; }
+        .price {
+            background: var(--light-blue); color: var(--primary-blue);
+            padding: 6px 18px; border-radius: 30px; font-weight: 600; font-size: 1.1rem; transition: var(--transition); font-family: 'Poppins', sans-serif;
+        }
+
+        /* =========================================
+           5. OPTIONS (M/L & CREATIVE FLAVOR CHIPS)
+           ========================================= */
+        .variant-selector {
+            display: flex; gap: 5px; background: var(--white); padding: 4px; border-radius: 20px; box-shadow: inset 0 2px 5px rgba(0,0,0,0.03); border: 1px solid rgba(0,0,0,0.05);
+        }
+        .variant-selector input[type="radio"] { display: none; }
+        .variant-selector label {
+            padding: 4px 12px; border-radius: 15px; font-size: 0.85rem; font-weight: 600; cursor: pointer; color: var(--text-muted); transition: var(--transition); font-family: 'Poppins', sans-serif;
+        }
+        .variant-selector input[type="radio"]:checked + label { background: var(--primary-blue); color: var(--white); box-shadow: 0 2px 8px rgba(100, 181, 246, 0.4); }
+
+        /* The Creative Flavor Chips (Replaces Dropdown) */
+        .flavor-chips {
+            display: flex; flex-wrap: wrap; gap: 8px; width: 100%; margin-top: 12px;
+        }
+        .flavor-chips input[type="radio"] { display: none; }
+        .flavor-chips label {
+            padding: 6px 14px; border-radius: 20px; font-size: 0.85rem; font-weight: 500; cursor: pointer;
+            color: var(--primary-blue); background: var(--white); border: 1px solid var(--light-blue);
+            transition: var(--transition); box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+        }
+        .flavor-chips label:hover {
+            background: var(--light-blue); border-color: var(--primary-blue);
+        }
+        .flavor-chips input[type="radio"]:checked + label {
+            background: var(--primary-blue); color: var(--white); border-color: var(--primary-blue);
+            box-shadow: 0 4px 12px rgba(100, 181, 246, 0.35); transform: translateY(-2px);
+        }
+
+        /* =========================================
+           6. CUTE 404, FOOTER & FLOATING BUTTON
+           ========================================= */
+        #no-results { text-align: center; margin-top: 50px; display: none; animation: fadeUpIn 0.5s forwards; }
+        .cute-cup { width: 150px; height: 150px; margin-bottom: 20px; animation: float 3s ease-in-out infinite; }
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
+
+        .footer-address { padding: 30px 20px; margin-bottom: 20px; }
+
+        .call-float {
+            position: fixed; bottom: 30px; right: 30px; background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: #fff; width: 60px; height: 60px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 1.6rem;
+            box-shadow: 0 10px 20px rgba(79, 172, 254, 0.4); z-index: 1000; text-decoration: none; animation: pulse-ring 2s infinite; transition: var(--transition);
+        }
+        body.ar-mode .call-float { right: auto; left: 30px; } 
+        .call-float:hover { transform: scale(1.1); color: #fff; }
+
+        @keyframes pulse-ring {
+            0% { box-shadow: 0 0 0 0 rgba(79, 172, 254, 0.7); }
+            70% { box-shadow: 0 0 0 15px rgba(79, 172, 254, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(79, 172, 254, 0); }
+        }
+
+        .fade-in { opacity: 0; transform: translateY(30px); transition: opacity 0.8s ease, transform 0.8s ease; }
+        .fade-in.visible { opacity: 1; transform: translateY(0); }
+        .price-update-anim { animation: pop 0.3s ease; }
+        @keyframes pop { 50% { transform: scale(1.2); color: #4facfe; } }
+
+        @media (max-width: 768px) {
+            .menu-item { flex-direction: column; align-items: flex-start; }
+            .price-container { width: 100%; justify-content: space-between; margin-top: 5px; }
+            .menu-category { padding: 25px 20px; }
+            .nav-logo { height: 50px; }
+            .flavor-chips label { padding: 5px 12px; font-size: 0.8rem; } /* أصغر قليلاً في الموبايل */
+        }
+    </style>
+</head>
+<body class="ar-mode">
+
+    <div id="splash-screen">
+        <svg class="splash-icon" viewBox="0 0 100 100">
+            <path class="single-line-path" d="M20,30 C20,30 20,70 50,70 C80,70 80,30 80,30 M25,30 L75,30 M80,40 C90,40 95,45 95,50 C95,55 90,60 80,60 M40,15 C40,10 45,5 50,15 C55,25 60,10 60,20"/>
+        </svg>
+        <div class="splash-text quote-font">Every Cup Holds a Story<br>Every Sip Paints a Memory</div>
+        <button class="enter-btn" id="enter-btn">
+            <span class="en-only">Enter Menu</span><span class="ar-only">عرض المنيو</span>
+        </button>
+    </div>
+
+    <audio id="bg-music" loop>
+        <source src="https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=lofi-study-112191.mp3" type="audio/mpeg">
+    </audio>
+
+    <nav class="navbar fixed-top glass-nav">
+        <div class="container d-flex justify-content-between align-items-center">
+            <a class="navbar-brand d-flex align-items-center" href="#">
+                <img src="logo.png" alt="Lavie Logo" class="nav-logo" onerror="this.style.display='none';"> 
+            </a>
+            <div class="nav-controls">
+                <div class="search-box" id="searchContainer">
+                    <i class="fa-solid fa-search search-icon" id="searchIcon"></i>
+                    <input type="text" id="searchInput" placeholder="بحث...">
+                </div>
+                <button class="lang-btn" id="langToggle">EN</button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container mb-3 mt-4" id="menu-container">
+
+        <section class="menu-category fade-in">
+            <div class="category-header"><i class="fa-solid fa-glass-water icon"></i><h2><span class="en-only">Soda</span><span class="ar-only">صودا</span></h2></div>
+            <div class="menu-list">
+                <div class="menu-item"><div class="item-names"><span class="en-only">Blue Ocean</span><span class="ar-only">بلو أوشن</span></div><div class="price-container"><span class="price">75</span></div></div>
+                <div class="menu-item"><div class="item-names"><span class="en-only">Green Mint</span><span class="ar-only">نعناع أخضر</span></div><div class="price-container"><span class="price">75</span></div></div>
+                <div class="menu-item"><div class="item-names"><span class="en-only">Strawberry</span><span class="ar-only">فراولة</span></div><div class="price-container"><span class="price">75</span></div></div>
+                <div class="menu-item"><div class="item-names"><span class="en-only">Cherry Cola</span><span class="ar-only">شيري كولا</span></div><div class="price-container"><span class="price">75</span></div></div>
+                <div class="menu-item"><div class="item-names"><span class="en-only">Blue Passion</span><span class="ar-only">بلو باشن</span></div><div class="price-container"><span class="price">80</span></div></div>
+                <div class="menu-item"><div class="item-names"><span class="en-only">Mix Lavie</span><span class="ar-only">ميكس لافي</span></div><div class="price-container"><span class="price">85</span></div></div>
+            </div>
+        </section>
+
+        <section class="menu-category fade-in">
+            <div class="category-header"><i class="fa-solid fa-blender icon"></i><h2><span class="en-only">Smoothies</span><span class="ar-only">سموزي</span></h2></div>
+            <div class="menu-list">
+                <div class="menu-item"><div class="item-names"><span class="en-only">Lemon Mint</span><span class="ar-only">ليمون نعناع</span></div><div class="price-container"><span class="price">90</span></div></div>
+                <div class="menu-item"><div class="item-names"><span class="en-only">Mix Berry</span><span class="ar-only">ميكس بيري</span></div><div class="price-container"><span class="price">90</span></div></div>
+                <div class="menu-item"><div class="item-names"><span class="en-only">Mango</span><span class="ar-only">مانجو</span></div><div class="price-container"><span class="price">90</span></div></div>
+                <div class="menu-item"><div class="item-names"><span class="en-only">Passion Fruit</span><span class="ar-only">باشن فروت</span></div><div class="price-container"><span class="price">90</span></div></div>
+                <div class="menu-item"><div class="item-names"><span class="en-only">Strawberry</span><span class="ar-only">فراولة</span></div><div class="price-container"><span class="price">90</span></div></div>
+            </div>
+        </section>
+
+        <section class="menu-category fade-in">
+            <div class="category-header"><i class="fa-solid fa-apple-whole icon"></i><h2><span class="en-only">Fresh Juices</span><span class="ar-only">عصائر فريش</span></h2></div>
+            <div class="menu-list">
+                <div class="menu-item"><div class="item-names"><span class="en-only">Mango</span><span class="ar-only">مانجو</span></div><div class="price-container"><span class="price">60</span></div></div>
+                <div class="menu-item"><div class="item-names"><span class="en-only">Strawberry</span><span class="ar-only">فراولة</span></div><div class="price-container"><span class="price">60</span></div></div>
+                <div class="menu-item"><div class="item-names"><span class="en-only">Guava</span><span class="ar-only">جوافة</span></div><div class="price-container"><span class="price">60</span></div></div>
+                <div class="menu-item"><div class="item-names"><span class="en-only">Lemon</span><span class="ar-only">ليمون</span></div><div class="price-container"><span class="price">60</span></div></div>
+                <div class="menu-item"><div class="item-names"><span class="en-only">Lemon Mint</span><span class="ar-only">ليمون نعناع</span></div><div class="price-container"><span class="price">60</span></div></div>
+                <div class="menu-item"><div class="item-names"><span class="en-only">Kiwi</span><span class="ar-only">كيوي</span></div><div class="price-container"><span class="price">60</span></div></div>
+            </div>
+        </section>
+
+        <section class="menu-category fade-in">
+            <div class="category-header"><i class="fa-solid fa-ice-cream icon"></i><h2><span class="en-only">Milkshakes</span><span class="ar-only">ميلك شيك</span></h2></div>
+            <div class="menu-list">
+                
+                <div class="menu-item flex-column align-items-stretch">
+                    <div class="d-flex justify-content-between align-items-center w-100">
+                        <div class="item-names"><span class="en-only">Classic</span><span class="ar-only">كلاسيك</span></div>
+                        <div class="price-container"><span class="price">85</span></div>
+                    </div>
+                    <div class="flavor-chips">
+                        <input type="radio" name="ms_classic" id="ms_c_van" checked>
+                        <label for="ms_c_van"><span class="en-only">Vanilla</span><span class="ar-only">فانيليا</span></label>
+                        
+                        <input type="radio" name="ms_classic" id="ms_c_str">
+                        <label for="ms_c_str"><span class="en-only">Strawberry</span><span class="ar-only">فراولة</span></label>
+                        
+                        <input type="radio" name="ms_classic" id="ms_c_cho">
+                        <label for="ms_c_cho"><span class="en-only">Chocolate</span><span class="ar-only">شوكولاتة</span></label>
+                    </div>
+                </div>
+
+                <div class="menu-item flex-column align-items-stretch">
+                    <div class="d-flex justify-content-between align-items-center w-100">
+                        <div class="item-names"><span class="en-only">Special</span><span class="ar-only">سبيشيال</span></div>
+                        <div class="price-container"><span class="price">100</span></div>
+                    </div>
+                    <div class="flavor-chips">
+                        <input type="radio" name="ms_special" id="ms_s_lot" checked>
+                        <label for="ms_s_lot"><span class="en-only">Lotus</span><span class="ar-only">لوتس</span></label>
+                        
+                        <input type="radio" name="ms_special" id="ms_s_pis">
+                        <label for="ms_s_pis"><span class="en-only">Pistachio</span><span class="ar-only">فستق</span></label>
+                        
+                        <input type="radio" name="ms_special" id="ms_s_ore">
+                        <label for="ms_s_ore"><span class="en-only">Oreo</span><span class="ar-only">أوريو</span></label>
+                        
+                        <input type="radio" name="ms_special" id="ms_s_ber">
+                        <label for="ms_s_ber"><span class="en-only">Berry</span><span class="ar-only">توت</span></label>
+
+                        <input type="radio" name="ms_special" id="ms_s_kiw">
+                        <label for="ms_s_kiw"><span class="en-only">Kiwi</span><span class="ar-only">كيوي</span></label>
+
+                        <input type="radio" name="ms_special" id="ms_s_pas">
+                        <label for="ms_s_pas"><span class="en-only">Passion Fruit</span><span class="ar-only">باشن فروت</span></label>
+                    </div>
+                </div>
+
+                <div class="menu-item flex-column align-items-stretch">
+                    <div class="d-flex justify-content-between align-items-center w-100">
+                        <div class="item-names"><span class="en-only">Lavie Shake</span><span class="ar-only">لافي شيك</span></div>
+                        <div class="price-container"><span class="price">115</span></div>
+                    </div>
+                    <div class="flavor-chips">
+                        <input type="radio" name="ms_lavie" id="ms_l_che" checked>
+                        <label for="ms_l_che"><span class="en-only">Cheesecake</span><span class="ar-only">تشيز كيك</span></label>
+                        
+                        <input type="radio" name="ms_lavie" id="ms_l_fud">
+                        <label for="ms_l_fud"><span class="en-only">Fudge</span><span class="ar-only">فادج</span></label>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <section class="menu-category fade-in">
+            <div class="category-header"><i class="fa-solid fa-bottle-water icon"></i><h2><span class="en-only">Soft Drinks</span><span class="ar-only">مشروبات غازية</span></h2></div>
+            <div class="menu-list">
+                <div class="menu-item"><div class="item-names"><span class="en-only">Small Water</span><span class="ar-only">مياه صغيرة</span></div><div class="price-container"><span class="price">15</span></div></div>
+                <div class="menu-item"><div class="item-names"><span class="en-only">Pepsi</span><span class="ar-only">بيبسي</span></div><div class="price-container"><span class="price">35</span></div></div>
+                <div class="menu-item"><div class="item-names"><span class="en-only">Schweppes</span><span class="ar-only">شويبس</span></div><div class="price-container"><span class="price">35</span></div></div>
+                <div class="menu-item"><div class="item-names"><span class="en-only">7UP</span><span class="ar-only">7UP</span></div><div class="price-container"><span class="price">35</span></div></div>
+                <div class="menu-item"><div class="item-names"><span class="en-only">Red Bull Classic</span><span class="ar-only">ريد بول كلاسيك</span></div><div class="price-container"><span class="price">85</span></div></div>
+                <div class="menu-item"><div class="item-names"><span class="en-only">Red Bull Mix Berry</span><span class="ar-only">ريد بول ميكس بيري</span></div><div class="price-container"><span class="price">110</span></div></div>
+            </div>
+        </section>
+
+        <section class="menu-category fade-in">
+            <div class="category-header"><i class="fa-solid fa-mug-hot icon"></i><h2><span class="en-only">Hot Coffee</span><span class="ar-only">قهوة ساخنة</span></h2></div>
+            <div class="menu-list">
+                <div class="menu-item"><div class="item-names"><span class="en-only">Espresso Single</span><span class="ar-only">إسبريسو سينجل</span></div><div class="price-container"><span class="price">50</span></div></div>
+                <div class="menu-item"><div class="item-names"><span class="en-only">Espresso Double</span><span class="ar-only">إسبريسو دبل</span></div><div class="price-container"><span class="price">60</span></div></div>
+                <div class="menu-item"><div class="item-names"><span class="en-only">Macchiato</span><span class="ar-only">ماكياتو</span></div><div class="price-container"><span class="price">60</span></div></div>
+                <div class="menu-item"><div class="item-names"><span class="en-only">Cortado</span><span class="ar-only">كورتادو</span></div><div class="price-container"><span class="price">60</span></div></div>
+                <div class="menu-item"><div class="item-names"><span class="en-only">Americano</span><span class="ar-only">أمريكانو</span></div><div class="price-container"><span class="price">65</span></div></div>
+                <div class="menu-item"><div class="item-names"><span class="en-only">Latte</span><span class="ar-only">لاتيه</span></div><div class="price-container"><span class="price">75</span></div></div>
+                <div class="menu-item"><div class="item-names"><span class="en-only">Spanish Latte</span><span class="ar-only">سبانيش لاتيه</span></div><div class="price-container"><span class="price">90</span></div></div>
+                <div class="menu-item"><div class="item-names"><span class="en-only">Cappuccino</span><span class="ar-only">كابتشينو</span></div><div class="price-container"><span class="price">80</span></div></div>
+                <div class="menu-item"><div class="item-names"><span class="en-only">Flat White</span><span class="ar-only">فلات وايت</span></div><div class="price-container"><span class="price">75</span></div></div>
+                <div class="menu-item"><div class="item-names"><span class="en-only">Mocha</span><span class="ar-only">موكا</span></div><div class="price-container"><span class="price">85</span></div></div>
+                <div class="menu-item"><div class="item-names"><span class="en-only">White Mocha</span><span class="ar-only">وايت موكا</span></div><div class="price-container"><span class="price">85</span></div></div>
+                <div class="menu-item"><div class="item-names"><span class="en-only">Turkish Coffee</span><span class="ar-only">قهوة تركي</span></div><div class="price-container"><span class="price">40</span></div></div>
+                <div class="menu-item"><div class="item-names"><span class="en-only">Hazelnut Coffee</span><span class="ar-only">قهوة بندق</span></div><div class="price-container"><span class="price">60</span></div></div>
+                <div class="menu-item"><div class="item-names"><span class="en-only">French Coffee</span><span class="ar-only">قهوة فرنسي</span></div><div class="price-container"><span class="price">50</span></div></div>
+            </div>
+        </section>
+
+        <section class="menu-category fade-in">
+            <div class="category-header"><i class="fa-solid fa-mug-saucer icon"></i><h2><span class="en-only">Hot Chocolate</span><span class="ar-only">شوكولاتة ساخنة</span></h2></div>
+            <div class="menu-list">
+                <div class="menu-item">
+                    <div class="item-names"><span class="en-only">Classic</span><span class="ar-only">كلاسيك</span></div>
+                    <div class="price-container">
+                        <div class="variant-selector">
+                            <input type="radio" name="hc_class" id="h_c_m" checked data-price="75" onchange="updatePrice(this, 'p_hc_c')"><label for="h_c_m">M</label>
+                            <input type="radio" name="hc_class" id="h_c_l" data-price="85" onchange="updatePrice(this, 'p_hc_c')"><label for="h_c_l">L</label>
+                        </div>
+                        <span class="price" id="p_hc_c">75</span>
+                    </div>
+                </div>
+                <div class="menu-item">
+                    <div class="item-names"><span class="en-only">Oreo</span><span class="ar-only">أوريو</span></div>
+                    <div class="price-container">
+                        <div class="variant-selector">
+                            <input type="radio" name="hc_oreo" id="h_o_m" checked data-price="80" onchange="updatePrice(this, 'p_hc_o')"><label for="h_o_m">M</label>
+                            <input type="radio" name="hc_oreo" id="h_o_l" data-price="90" onchange="updatePrice(this, 'p_hc_o')"><label for="h_o_l">L</label>
+                        </div>
+                        <span class="price" id="p_hc_o">80</span>
+                    </div>
+                </div>
+                <div class="menu-item">
+                    <div class="item-names"><span class="en-only">Nutella</span><span class="ar-only">نوتيلا</span></div>
+                    <div class="price-container">
+                        <div class="variant-selector">
+                            <input type="radio" name="hc_nut" id="h_n_m" checked data-price="80" onchange="updatePrice(this, 'p_hc_n')"><label for="h_n_m">M</label>
+                            <input type="radio" name="hc_nut" id="h_n_l" data-price="90" onchange="updatePrice(this, 'p_hc_n')"><label for="h_n_l">L</label>
+                        </div>
+                        <span class="price" id="p_hc_n">80</span>
+                    </div>
+                </div>
+                <div class="menu-item">
+                    <div class="item-names"><span class="en-only">Marshmallow</span><span class="ar-only">مارشميلو</span></div>
+                    <div class="price-container">
+                        <div class="variant-selector">
+                            <input type="radio" name="hc_mar" id="h_m_m" checked data-price="80" onchange="updatePrice(this, 'p_hc_m')"><label for="h_m_m">M</label>
+                            <input type="radio" name="hc_mar" id="h_m_l" data-price="90" onchange="updatePrice(this, 'p_hc_m')"><label for="h_m_l">L</label>
+                        </div>
+                        <span class="price" id="p_hc_m">80</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="menu-category fade-in">
+            <div class="category-header"><i class="fa-solid fa-leaf icon"></i><h2><span class="en-only">Hot Drinks</span><span class="ar-only">مشروبات ساخنة</span></h2></div>
+            <div class="menu-list">
+                <div class="menu-item"><div class="item-names"><span class="en-only">Classic Tea</span><span class="ar-only">شاي كلاسيك</span></div><div class="price-container"><span class="price">35</span></div></div>
+                <div class="menu-item"><div class="item-names"><span class="en-only">Tea Latte</span><span class="ar-only">شاي لاتيه</span></div><div class="price-container"><span class="price">45</span></div></div>
+                <div class="menu-item"><div class="item-names"><span class="en-only">Flavored Tea</span><span class="ar-only">شاي نكهات</span></div><div class="price-container"><span class="price">40</span></div></div>
+                <div class="menu-item"><div class="item-names"><span class="en-only">Hot Cider</span><span class="ar-only">هوت سيدر</span></div><div class="price-container"><span class="price">55</span></div></div>
+                <div class="menu-item"><div class="item-names"><span class="en-only">Herbs</span><span class="ar-only">أعشاب</span></div><div class="price-container"><span class="price">40</span></div></div>
+            </div>
+        </section>
+
+        <section class="menu-category fade-in">
+            <div class="category-header"><i class="fa-solid fa-cup-togo icon"></i><h2><span class="en-only">Iced Coffee</span><span class="ar-only">قهوة مثلجة</span></h2></div>
+            <div class="menu-list">
+                <div class="menu-item"><div class="item-names"><span class="en-only">Ice Americano</span><span class="ar-only">آيس أمريكانو</span></div><div class="price-container"><span class="price">65</span></div></div>
+                <div class="menu-item"><div class="item-names"><span class="en-only">Ice Latte</span><span class="ar-only">آيس لاتيه</span></div><div class="price-container"><span class="price">75</span></div></div>
+                <div class="menu-item"><div class="item-names"><span class="en-only">Ice Spanish Latte</span><span class="ar-only">آيس سبانيش لاتيه</span></div><div class="price-container"><span class="price">90</span></div></div>
+                <div class="menu-item"><div class="item-names"><span class="en-only">Ice Mocha</span><span class="ar-only">آيس موكا</span></div><div class="price-container"><span class="price">85</span></div></div>
+                <div class="menu-item"><div class="item-names"><span class="en-only">Ice Caramel Macchiato</span><span class="ar-only">آيس كراميل ماكياتو</span></div><div class="price-container"><span class="price">100</span></div></div>
+                <div class="menu-item"><div class="item-names"><span class="en-only">Frappe Classic</span><span class="ar-only">فرابيه كلاسيك</span></div><div class="price-container"><span class="price">85</span></div></div>
+                <div class="menu-item"><div class="item-names"><span class="en-only">Frappe Caramel</span><span class="ar-only">فرابيه كراميل</span></div><div class="price-container"><span class="price">95</span></div></div>
+                <div class="menu-item"><div class="item-names"><span class="en-only">Frappe Hazelnut</span><span class="ar-only">فرابيه بندق</span></div><div class="price-container"><span class="price">95</span></div></div>
+                <div class="menu-item"><div class="item-names"><span class="en-only">Frappe Chocolate</span><span class="ar-only">فرابيه شوكولاتة</span></div><div class="price-container"><span class="price">95</span></div></div>
+                <div class="menu-item"><div class="item-names"><span class="en-only">Frappe Lotus</span><span class="ar-only">فرابيه لوتس</span></div><div class="price-container"><span class="price">95</span></div></div>
+            </div>
+        </section>
+
+        <section class="menu-category fade-in">
+            <div class="category-header"><i class="fa-solid fa-cake-candles icon"></i><h2><span class="en-only">Desserts</span><span class="ar-only">حلويات</span></h2></div>
+            <div class="menu-list">
+                <div class="menu-item"><div class="item-names"><span class="en-only">Fudge Chocolate</span><span class="ar-only">شوكولاتة فادج</span></div><div class="price-container"><span class="price">95</span></div></div>
+                <div class="menu-item"><div class="item-names"><span class="en-only">Cheesecake</span><span class="ar-only">تشيز كيك</span></div><div class="price-container"><span class="price">95</span></div></div>
+                <div class="menu-item"><div class="item-names"><span class="en-only">Molten Cake Classic</span><span class="ar-only">مولتن كيك كلاسيك</span></div><div class="price-container"><span class="price">95</span></div></div>
+                <div class="menu-item"><div class="item-names"><span class="en-only">Molten Nutella Special</span><span class="ar-only">مولتن نوتيلا سبيشيال</span></div><div class="price-container"><span class="price">105</span></div></div>
+                <div class="menu-item"><div class="item-names"><span class="en-only">Molten Chocolate Special</span><span class="ar-only">مولتن شوكولاتة سبيشيال</span></div><div class="price-container"><span class="price">105</span></div></div>
+                <div class="menu-item"><div class="item-names"><span class="en-only">Molten Ice Cream Special</span><span class="ar-only">مولتن آيس كريم سبيشيال</span></div><div class="price-container"><span class="price">105</span></div></div>
+                <div class="menu-item"><div class="item-names"><span class="en-only">American Cookies</span><span class="ar-only">أمريكان كوكيز</span></div><div class="price-container"><span class="price">65</span></div></div>
+                <div class="menu-item"><div class="item-names"><span class="en-only">Cinnabon</span><span class="ar-only">سينابون</span></div><div class="price-container"><span class="price">100</span></div></div>
+                <div class="menu-item"><div class="item-names"><span class="en-only">Waffle Nutella</span><span class="ar-only">وافل نوتيلا</span></div><div class="price-container"><span class="price">90</span></div></div>
+                <div class="menu-item"><div class="item-names"><span class="en-only">Waffle Lotus</span><span class="ar-only">وافل لوتس</span></div><div class="price-container"><span class="price">90</span></div></div>
+                <div class="menu-item"><div class="item-names"><span class="en-only">Waffle Special Pistachio</span><span class="ar-only">وافل سبيشيال فستق</span></div><div class="price-container"><span class="price">105</span></div></div>
+                <div class="menu-item"><div class="item-names"><span class="en-only">Waffle Special Oreo</span><span class="ar-only">وافل سبيشيال أوريو</span></div><div class="price-container"><span class="price">105</span></div></div>
+                <div class="menu-item"><div class="item-names"><span class="en-only">Pancake</span><span class="ar-only">بان كيك</span></div><div class="price-container"><span class="price">75</span></div></div>
+                <div class="menu-item"><div class="item-names"><span class="en-only">Pancake Mix Nutella</span><span class="ar-only">بان كيك ميكس نوتيلا</span></div><div class="price-container"><span class="price">95</span></div></div>
+                <div class="menu-item"><div class="item-names"><span class="en-only">Pancake Mix Lotus</span><span class="ar-only">بان كيك ميكس لوتس</span></div><div class="price-container"><span class="price">95</span></div></div>
+                <div class="menu-item"><div class="item-names"><span class="en-only">Pancake Mix Pistachio</span><span class="ar-only">بان كيك ميكس فستق</span></div><div class="price-container"><span class="price">95</span></div></div>
+                <div class="menu-item"><div class="item-names"><span class="en-only">Pancake Mix Caramel</span><span class="ar-only">بان كيك ميكس كراميل</span></div><div class="price-container"><span class="price">95</span></div></div>
+                <div class="menu-item"><div class="item-names"><span class="en-only">Lavie Pancake</span><span class="ar-only">لافي بان كيك</span></div><div class="price-container"><span class="price">150</span></div></div>
+            </div>
+        </section>
+
+        <section class="menu-category fade-in">
+            <div class="category-header"><i class="fa-solid fa-plus icon"></i><h2><span class="en-only">Extras</span><span class="ar-only">إضافات</span></h2></div>
+            <div class="menu-list">
+                <div class="menu-item"><div class="item-names"><span class="en-only">Flavor</span><span class="ar-only">نكهة</span></div><div class="price-container"><span class="price">20</span></div></div>
+                <div class="menu-item"><div class="item-names"><span class="en-only">Nutella Chocolate</span><span class="ar-only">شوكولاتة نوتيلا</span></div><div class="price-container"><span class="price">20</span></div></div>
+                <div class="menu-item"><div class="item-names"><span class="en-only">Pistachio</span><span class="ar-only">فستق</span></div><div class="price-container"><span class="price">25</span></div></div>
+                <div class="menu-item"><div class="item-names"><span class="en-only">Ice Cream</span><span class="ar-only">آيس كريم</span></div><div class="price-container"><span class="price">20</span></div></div>
+            </div>
+        </section>
+
+        <div id="no-results">
+            <svg class="cute-cup" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <path d="M20,20 Q20,80 35,90 L65,90 Q80,80 80,20 Z" fill="#E3F2FD" stroke="#64B5F6" stroke-width="4"/>
+                <path d="M35,45 Q40,40 45,45" fill="none" stroke="#1F2937" stroke-width="3" stroke-linecap="round"/>
+                <path d="M55,45 Q60,40 65,45" fill="none" stroke="#1F2937" stroke-width="3" stroke-linecap="round"/>
+                <path d="M45,60 Q50,55 55,60" fill="none" stroke="#1F2937" stroke-width="3" stroke-linecap="round"/>
+                <path d="M35,55 Q35,65 35,65" stroke="#64B5F6" stroke-width="3" stroke-linecap="round" stroke-dasharray="2,5"/>
+                <path d="M80,35 Q95,35 95,50 Q95,65 80,65" fill="none" stroke="#64B5F6" stroke-width="4"/>
+            </svg>
+            <h4 class="fw-bold text-dark">
+                <span class="en-only">Oops, item not found!</span>
+                <span class="ar-only">للأسف، مش لاقيين طلبك!</span>
+            </h4>
+        </div>
+
+    </main>
+
+    <footer class="footer-address text-center fade-in pb-5">
+        <i class="fa-solid fa-location-dot fs-3 mb-3" style="color: var(--primary-blue);"></i>
+        <h5 class="fw-bold text-dark mb-2">
+            <span class="en-only">Our Location</span>
+            <span class="ar-only">موقعنا</span>
+        </h5>
+        <p class="text-muted fs-5 m-0" style="max-width: 400px; margin: 0 auto !important;">
+            <span class="en-only">Highway, in front of the Radio and Television Building</span>
+            <span class="ar-only">الطريق السريع امام مبني الاذاعة والتلفزيون</span>
+        </p>
+    </footer>
+
+    <a href="tel:+201010747945" class="call-float" title="Call Us">
+        <i class="fa-solid fa-phone"></i>
+    </a>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            
+            // --- Language Toggle Logic ---
+            const langToggle = document.getElementById('langToggle');
+            const searchInput = document.getElementById('searchInput');
+
+            langToggle.addEventListener('click', () => {
+                const isAr = document.body.classList.contains('ar-mode');
+                
+                if (isAr) {
+                    // Switch to English
+                    document.body.classList.replace('ar-mode', 'en-mode');
+                    document.documentElement.dir = 'ltr';
+                    document.documentElement.lang = 'en';
+                    langToggle.innerText = 'عربي';
+                    searchInput.placeholder = "Search...";
+                } else {
+                    // Switch to Arabic
+                    document.body.classList.replace('en-mode', 'ar-mode');
+                    document.documentElement.dir = 'rtl';
+                    document.documentElement.lang = 'ar';
+                    langToggle.innerText = 'EN';
+                    searchInput.placeholder = "بحث...";
+                }
+            });
+
+            // --- Splash Screen & Audio ---
+            const splash = document.getElementById('splash-screen');
+            const enterBtn = document.getElementById('enter-btn');
+            const bgAudio = document.getElementById('bg-music');
+
+            enterBtn.addEventListener('click', () => {
+                splash.style.opacity = '0';
+                splash.style.visibility = 'hidden';
+                bgAudio.volume = 0.3;
+                bgAudio.play().catch(() => console.log("Audio play prevented"));
+            });
+
+            // --- Dynamic Price Update for Hot Chocolate ---
+            window.updatePrice = function(radioElement, priceElementId) {
+                const priceBadge = document.getElementById(priceElementId);
+                priceBadge.innerText = radioElement.getAttribute('data-price');
+                
+                priceBadge.classList.remove('price-update-anim');
+                void priceBadge.offsetWidth;
+                priceBadge.classList.add('price-update-anim');
+            }
+
+            // --- Search Bar Animations ---
+            const searchContainer = document.getElementById('searchContainer');
+            const searchIcon = document.getElementById('searchIcon');
+
+            searchIcon.addEventListener('click', () => {
+                searchContainer.classList.add('active');
+                searchInput.focus();
+            });
+            
+            searchInput.addEventListener('blur', () => {
+                if(searchInput.value.trim() === '') searchContainer.classList.remove('active');
+            });
+
+            // --- Live Search with Cute 404 ---
+            const categories = document.querySelectorAll(".menu-category");
+            const noResultsMsg = document.getElementById("no-results");
+
+            searchInput.addEventListener("input", (e) => {
+                const searchTerm = e.target.value.toLowerCase().trim();
+                let anyVisibleTotal = false;
+
+                categories.forEach(category => {
+                    const items = category.querySelectorAll(".menu-item");
+                    let hasVisibleItem = false;
+
+                    items.forEach(item => {
+                        const textContent = item.querySelector('.item-names').textContent.toLowerCase();
+                        if (textContent.includes(searchTerm)) {
+                            item.style.display = "flex";
+                            hasVisibleItem = true;
+                            anyVisibleTotal = true;
+                        } else {
+                            item.style.display = "none";
+                        }
+                    });
+
+                    category.style.display = hasVisibleItem ? "block" : "none";
+                });
+
+                noResultsMsg.style.display = (!anyVisibleTotal && searchTerm !== "") ? "block" : "none";
+            });
+
+            // --- Scroll Reveal ---
+            const fadeElements = document.querySelectorAll('.fade-in');
+            const observer = new IntersectionObserver((entries, obs) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                        obs.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            fadeElements.forEach(el => observer.observe(el));
+        });
+    </script>
+</body>
+</html>
