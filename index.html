@@ -128,17 +128,17 @@
 
         .menu-item {
             display: flex; justify-content: space-between; align-items: center;
-            padding: 18px 15px; border-bottom: 1px solid rgba(0,0,0,0.05); transition: var(--transition); flex-wrap: wrap; gap: 10px;
+            padding: 18px 15px; border-bottom: 1px solid rgba(0,0,0,0.05); transition: var(--transition); flex-wrap: nowrap; gap: 10px;
         }
         .menu-item:last-child { border-bottom: none; }
         .menu-item:hover { background: rgba(255,255,255,0.5); border-radius: 12px; transform: scale(1.01); }
 
-        .item-names { font-weight: 600; font-size: 1.15rem; color: var(--text-dark); flex-grow: 1; }
+        .item-names { font-weight: 600; font-size: 1.15rem; color: var(--text-dark); flex-grow: 1; line-height: 1.3; }
 
-        .price-container { display: flex; align-items: center; gap: 15px; }
+        .price-container { display: flex; align-items: center; gap: 15px; flex-shrink: 0; }
         .price {
             background: var(--light-blue); color: var(--primary-blue);
-            padding: 6px 18px; border-radius: 30px; font-weight: 600; font-size: 1.1rem; transition: var(--transition); font-family: 'Poppins', sans-serif;
+            padding: 6px 18px; border-radius: 30px; font-weight: 600; font-size: 1.1rem; transition: var(--transition); font-family: 'Poppins', sans-serif; text-align: center;
         }
 
         /* =========================================
@@ -149,11 +149,11 @@
         }
         .variant-selector input[type="radio"] { display: none; }
         .variant-selector label {
-            padding: 4px 12px; border-radius: 15px; font-size: 0.85rem; font-weight: 600; cursor: pointer; color: var(--text-muted); transition: var(--transition); font-family: 'Poppins', sans-serif;
+            padding: 4px 12px; border-radius: 15px; font-size: 0.85rem; font-weight: 600; cursor: pointer; color: var(--text-muted); transition: var(--transition); font-family: 'Poppins', sans-serif; margin: 0;
         }
         .variant-selector input[type="radio"]:checked + label { background: var(--primary-blue); color: var(--white); box-shadow: 0 2px 8px rgba(100, 181, 246, 0.4); }
 
-        /* The Creative Flavor Chips (Replaces Dropdown) */
+        /* The Creative Flavor Chips */
         .flavor-chips {
             display: flex; flex-wrap: wrap; gap: 8px; width: 100%; margin-top: 12px;
         }
@@ -161,7 +161,7 @@
         .flavor-chips label {
             padding: 6px 14px; border-radius: 20px; font-size: 0.85rem; font-weight: 500; cursor: pointer;
             color: var(--primary-blue); background: var(--white); border: 1px solid var(--light-blue);
-            transition: var(--transition); box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+            transition: var(--transition); box-shadow: 0 2px 5px rgba(0,0,0,0.02); margin: 0;
         }
         .flavor-chips label:hover {
             background: var(--light-blue); border-color: var(--primary-blue);
@@ -199,12 +199,26 @@
         .price-update-anim { animation: pop 0.3s ease; }
         @keyframes pop { 50% { transform: scale(1.2); color: #4facfe; } }
 
+        /* =========================================
+           7. MOBILE RESPONSIVE FIXES
+           ========================================= */
         @media (max-width: 768px) {
-            .menu-item { flex-direction: column; align-items: flex-start; }
-            .price-container { width: 100%; justify-content: space-between; margin-top: 5px; }
-            .menu-category { padding: 25px 20px; }
-            .nav-logo { height: 50px; }
-            .flavor-chips label { padding: 5px 12px; font-size: 0.8rem; } /* أصغر قليلاً في الموبايل */
+            /* الحفاظ على ترتيب العناصر في صف واحد */
+            .menu-item { flex-direction: row; flex-wrap: nowrap; padding: 12px 10px; align-items: center; }
+            
+            /* استثناء للميلك شيك عشان الزراير التفاعلية تنزل تحت عادي والاسم والسعر يفضلوا فوق بعض */
+            .menu-item.flex-column { flex-direction: column !important; align-items: stretch !important; }
+            
+            .item-names { font-size: 1rem; }
+            
+            /* تظبيط مساحات السعر والاختيارات في الموبايل */
+            .price-container { gap: 8px; width: auto; margin-top: 0; }
+            .price { padding: 4px 10px; font-size: 1rem; min-width: 45px; }
+            .variant-selector label { padding: 3px 8px; font-size: 0.75rem; }
+            
+            .menu-category { padding: 20px 15px; }
+            .nav-logo { height: 45px; } /* تصغير بسيط للوجو ليناسب شاشة الموبايل */
+            .flavor-chips label { padding: 4px 10px; font-size: 0.75rem; } 
         }
     </style>
 </head>
@@ -281,57 +295,49 @@
             <div class="menu-list">
                 
                 <div class="menu-item flex-column align-items-stretch">
-                    <div class="d-flex justify-content-between align-items-center w-100">
+                    <div class="d-flex justify-content-between align-items-center w-100 flex-nowrap">
                         <div class="item-names"><span class="en-only">Classic</span><span class="ar-only">كلاسيك</span></div>
                         <div class="price-container"><span class="price">85</span></div>
                     </div>
                     <div class="flavor-chips">
                         <input type="radio" name="ms_classic" id="ms_c_van" checked>
                         <label for="ms_c_van"><span class="en-only">Vanilla</span><span class="ar-only">فانيليا</span></label>
-                        
                         <input type="radio" name="ms_classic" id="ms_c_str">
                         <label for="ms_c_str"><span class="en-only">Strawberry</span><span class="ar-only">فراولة</span></label>
-                        
                         <input type="radio" name="ms_classic" id="ms_c_cho">
                         <label for="ms_c_cho"><span class="en-only">Chocolate</span><span class="ar-only">شوكولاتة</span></label>
                     </div>
                 </div>
 
                 <div class="menu-item flex-column align-items-stretch">
-                    <div class="d-flex justify-content-between align-items-center w-100">
+                    <div class="d-flex justify-content-between align-items-center w-100 flex-nowrap">
                         <div class="item-names"><span class="en-only">Special</span><span class="ar-only">سبيشيال</span></div>
                         <div class="price-container"><span class="price">100</span></div>
                     </div>
                     <div class="flavor-chips">
                         <input type="radio" name="ms_special" id="ms_s_lot" checked>
                         <label for="ms_s_lot"><span class="en-only">Lotus</span><span class="ar-only">لوتس</span></label>
-                        
                         <input type="radio" name="ms_special" id="ms_s_pis">
                         <label for="ms_s_pis"><span class="en-only">Pistachio</span><span class="ar-only">فستق</span></label>
-                        
                         <input type="radio" name="ms_special" id="ms_s_ore">
                         <label for="ms_s_ore"><span class="en-only">Oreo</span><span class="ar-only">أوريو</span></label>
-                        
                         <input type="radio" name="ms_special" id="ms_s_ber">
                         <label for="ms_s_ber"><span class="en-only">Berry</span><span class="ar-only">توت</span></label>
-
                         <input type="radio" name="ms_special" id="ms_s_kiw">
                         <label for="ms_s_kiw"><span class="en-only">Kiwi</span><span class="ar-only">كيوي</span></label>
-
                         <input type="radio" name="ms_special" id="ms_s_pas">
-                        <label for="ms_s_pas"><span class="en-only">Passion Fruit</span><span class="ar-only">باشن فروت</span></label>
+                        <label for="ms_s_pas"><span class="en-only">Passion</span><span class="ar-only">باشن</span></label>
                     </div>
                 </div>
 
                 <div class="menu-item flex-column align-items-stretch">
-                    <div class="d-flex justify-content-between align-items-center w-100">
+                    <div class="d-flex justify-content-between align-items-center w-100 flex-nowrap">
                         <div class="item-names"><span class="en-only">Lavie Shake</span><span class="ar-only">لافي شيك</span></div>
                         <div class="price-container"><span class="price">115</span></div>
                     </div>
                     <div class="flavor-chips">
                         <input type="radio" name="ms_lavie" id="ms_l_che" checked>
                         <label for="ms_l_che"><span class="en-only">Cheesecake</span><span class="ar-only">تشيز كيك</span></label>
-                        
                         <input type="radio" name="ms_lavie" id="ms_l_fud">
                         <label for="ms_l_fud"><span class="en-only">Fudge</span><span class="ar-only">فادج</span></label>
                     </div>
