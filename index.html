@@ -34,6 +34,7 @@
             padding-top: 100px;
             min-height: 100vh;
             overflow-x: hidden;
+            position: relative;
         }
 
         @keyframes gradientBG {
@@ -113,13 +114,39 @@
         body.en-mode .search-icon { left: 15px; }
 
         /* =========================================
-           4. MENU CATEGORIES & ITEMS
+           4. MENU CATEGORIES & ITEMS (WITH WATERMARK)
            ========================================= */
         .menu-category {
+            position: relative;
+            overflow: hidden; /* To keep watermark inside rounded corners */
             background: var(--glass-bg); backdrop-filter: blur(15px);
             border: 1px solid var(--white); border-radius: 24px; padding: 35px 30px; margin-bottom: 40px; box-shadow: var(--glass-shadow); transition: var(--transition);
         }
         .menu-category:hover { transform: translateY(-5px); box-shadow: 0 15px 40px rgba(100, 181, 246, 0.2); }
+
+        /* Section Watermark (Logo inside each category) */
+        .menu-category::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 60%; /* حجم اللوجو كخلفية للقسم */
+            height: 60%;
+            background-image: url('logo.png');
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: contain;
+            opacity: 0.04; /* شفافية أنيقة جداً */
+            pointer-events: none; /* لا يعيق النقر */
+            z-index: 0;
+        }
+
+        /* Elevate content above watermark */
+        .category-header, .menu-list {
+            position: relative;
+            z-index: 1; 
+        }
 
         .category-header { display: flex; align-items: center; justify-content: center; margin-bottom: 30px; position: relative; }
         .category-header::after { content: ''; position: absolute; bottom: -10px; width: 50px; height: 3px; background: var(--primary-blue); border-radius: 5px; }
@@ -153,7 +180,6 @@
         }
         .variant-selector input[type="radio"]:checked + label { background: var(--primary-blue); color: var(--white); box-shadow: 0 2px 8px rgba(100, 181, 246, 0.4); }
 
-        /* The Creative Flavor Chips */
         .flavor-chips {
             display: flex; flex-wrap: wrap; gap: 8px; width: 100%; margin-top: 12px;
         }
@@ -163,16 +189,14 @@
             color: var(--primary-blue); background: var(--white); border: 1px solid var(--light-blue);
             transition: var(--transition); box-shadow: 0 2px 5px rgba(0,0,0,0.02); margin: 0;
         }
-        .flavor-chips label:hover {
-            background: var(--light-blue); border-color: var(--primary-blue);
-        }
+        .flavor-chips label:hover { background: var(--light-blue); border-color: var(--primary-blue); }
         .flavor-chips input[type="radio"]:checked + label {
             background: var(--primary-blue); color: var(--white); border-color: var(--primary-blue);
             box-shadow: 0 4px 12px rgba(100, 181, 246, 0.35); transform: translateY(-2px);
         }
 
         /* =========================================
-           6. CUTE 404, FOOTER & FLOATING BUTTON
+           6. CUTE 404 & FOOTER
            ========================================= */
         #no-results { text-align: center; margin-top: 50px; display: none; animation: fadeUpIn 0.5s forwards; }
         .cute-cup { width: 150px; height: 150px; margin-bottom: 20px; animation: float 3s ease-in-out infinite; }
@@ -180,18 +204,44 @@
 
         .footer-address { padding: 30px 20px; margin-bottom: 20px; }
 
-        .call-float {
-            position: fixed; bottom: 30px; right: 30px; background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-            color: #fff; width: 60px; height: 60px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 1.6rem;
-            box-shadow: 0 10px 20px rgba(79, 172, 254, 0.4); z-index: 1000; text-decoration: none; animation: pulse-ring 2s infinite; transition: var(--transition);
+        /* =========================================
+           7. FLOATING CONTACT BUTTONS
+           ========================================= */
+        .call-float, .whatsapp-float {
+            position: fixed; right: 30px; 
+            width: 60px; height: 60px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 1.6rem;
+            z-index: 1000; text-decoration: none; transition: var(--transition);
         }
-        body.ar-mode .call-float { right: auto; left: 30px; } 
+
+        /* Call Button Style (Blue) */
+        .call-float {
+            bottom: 30px;
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: #fff;
+            box-shadow: 0 10px 20px rgba(79, 172, 254, 0.4); animation: pulse-ring-blue 2s infinite;
+        }
         .call-float:hover { transform: scale(1.1); color: #fff; }
 
-        @keyframes pulse-ring {
+        /* WhatsApp Button Style (Green) */
+        .whatsapp-float {
+            bottom: 105px; /* يرتفع عن زر الاتصال */
+            background: linear-gradient(135deg, #25D366 0%, #128C7E 100%); color: #fff;
+            box-shadow: 0 10px 20px rgba(37, 211, 102, 0.4); animation: pulse-ring-green 2s infinite; font-size: 1.8rem;
+        }
+        .whatsapp-float:hover { transform: scale(1.1); color: #fff; }
+
+        /* RTL Direction adjustments for buttons */
+        body.ar-mode .call-float, body.ar-mode .whatsapp-float { right: auto; left: 30px; } 
+
+        @keyframes pulse-ring-blue {
             0% { box-shadow: 0 0 0 0 rgba(79, 172, 254, 0.7); }
             70% { box-shadow: 0 0 0 15px rgba(79, 172, 254, 0); }
             100% { box-shadow: 0 0 0 0 rgba(79, 172, 254, 0); }
+        }
+
+        @keyframes pulse-ring-green {
+            0% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.7); }
+            70% { box-shadow: 0 0 0 15px rgba(37, 211, 102, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0); }
         }
 
         .fade-in { opacity: 0; transform: translateY(30px); transition: opacity 0.8s ease, transform 0.8s ease; }
@@ -200,25 +250,19 @@
         @keyframes pop { 50% { transform: scale(1.2); color: #4facfe; } }
 
         /* =========================================
-           7. MOBILE RESPONSIVE FIXES
+           8. MOBILE RESPONSIVE FIXES
            ========================================= */
         @media (max-width: 768px) {
-            /* الحفاظ على ترتيب العناصر في صف واحد */
             .menu-item { flex-direction: row; flex-wrap: nowrap; padding: 12px 10px; align-items: center; }
-            
-            /* استثناء للميلك شيك عشان الزراير التفاعلية تنزل تحت عادي والاسم والسعر يفضلوا فوق بعض */
             .menu-item.flex-column { flex-direction: column !important; align-items: stretch !important; }
-            
             .item-names { font-size: 1rem; }
-            
-            /* تظبيط مساحات السعر والاختيارات في الموبايل */
             .price-container { gap: 8px; width: auto; margin-top: 0; }
             .price { padding: 4px 10px; font-size: 1rem; min-width: 45px; }
             .variant-selector label { padding: 3px 8px; font-size: 0.75rem; }
-            
             .menu-category { padding: 20px 15px; }
-            .nav-logo { height: 45px; } /* تصغير بسيط للوجو ليناسب شاشة الموبايل */
+            .nav-logo { height: 45px; } 
             .flavor-chips label { padding: 4px 10px; font-size: 0.75rem; } 
+            .menu-category::after { width: 80%; height: 80%; } /* تكبير الواترمارك نسبياً في كروت الموبايل */
         }
     </style>
 </head>
@@ -233,10 +277,6 @@
             <span class="en-only">Enter Menu</span><span class="ar-only">عرض المنيو</span>
         </button>
     </div>
-
-    <audio id="bg-music" loop>
-        <source src="https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=lofi-study-112191.mp3" type="audio/mpeg">
-    </audio>
 
     <nav class="navbar fixed-top glass-nav">
         <div class="container d-flex justify-content-between align-items-center">
@@ -514,7 +554,10 @@
         </p>
     </footer>
 
-    <a href="tel:+201010747945" class="call-float" title="Call Us">
+    <a href="https://wa.me/201010747945" class="whatsapp-float" title="WhatsApp Us" target="_blank">
+        <i class="fa-brands fa-whatsapp"></i>
+    </a>
+    <a href="tel:+201033337140" class="call-float" title="Call Us">
         <i class="fa-solid fa-phone"></i>
     </a>
 
